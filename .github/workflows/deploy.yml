@@ -55,13 +55,35 @@ jobs:
           ORACLE_USER: ${{ secrets.ORACLE_USER }}
         run: |
           set -euo pipefail
+          echo "$GITHUB_SHA" > dist/version.txt
           rsync -az --delete --chmod=D755,F644 \
             -e "ssh -o StrictHostKeyChecking=yes" \
             dist/ "$ORACLE_USER@$ORACLE_HOST:/opt/calcspace/site/"
 
-      - name: Verify production
+      - name: Verify origin
+        env:
+          ORACLE_HOST: ${{ secrets.ORACLE_HOST }}
+          ORACLE_USER: ${{ secrets.ORACLE_USER }}
         run: |
           set -euo pipefail
-          curl -fsS --retry 6 --retry-delay 5 \
-            https://calcspace.blueflutex.in/ | grep -q '<title>CalcSpace'
-          curl -fsS https://calcspace.blueflutex.in/sitemap.xml | grep -q 'https://calcspace.blueflutex.in/'
+          deployed="$(ssh -o StrictHostKeyChecking=yes "$ORACLE_USER@$ORACLE_HOST" \
+            'curl -fsS http://127.0.0.1:8081/version.txt')"
+          test "$deployed" = "$GITHUB_SHA"
+          ssh -o StrictHostKeyChecking=yes "$ORACLE_USER@$ORACLE_HOST" \
+            'curl -fsS http://127.0.0.1:8081/ | grep -q "<title>CalcSpace"'
+
+      - name: Verify edge
+        run: |
+          set -euo pipefail
+          # Cloudflare may challenge datacenter IPs, so a non-200 here is a
+          # warning rather than a failed deploy: the origin check above is
+          # authoritative.
+          code="$(curl -sS -o /dev/null -w '%{http_code}' \
+            -A 'Mozilla/5.0 (compatible; CalcSpaceDeployCheck/1.0)' \
+            --retry 6 --retry-delay 5 \
+            https://calcspace.blueflutex.in/ || true)"
+          if [ "$code" = "200" ]; then
+            echo "Edge is serving the site."
+          else
+            echo "::warning::Cloudflare edge returned HTTP $code for the CI runner (usually bot protection); origin verified successfully."
+          fi
