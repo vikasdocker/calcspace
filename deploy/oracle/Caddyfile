@@ -2,8 +2,8 @@
 	root * /srv
 	encode zstd gzip
 
-	# Every route is pre-rendered by the Vite build, so a real 404 is possible.
-	try_files {path} {path}.html {path}/index.html
+	# Client-side router renders the not-found page (noindex) for unknown paths.
+	try_files {path} {path}.html {path}/index.html /index.html
 	file_server
 
 	header {
