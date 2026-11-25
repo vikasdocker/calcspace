@@ -1,0 +1,67 @@
+name: Deploy production
+
+# Oracle Cloud origin (Caddy container) behind a Cloudflare Tunnel.
+# Repository secrets:
+#   ORACLE_HOST     public IP or hostname of the VM
+#   ORACLE_USER     SSH user (ubuntu)
+#   ORACLE_SSH_KEY  private key of the deploy keypair
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://calcspace.blueflutex.in
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+        env:
+          VITE_SITE_URL: https://calcspace.blueflutex.in
+
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+          ORACLE_HOST: ${{ secrets.ORACLE_HOST }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$ORACLE_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Upload build to Oracle origin
+        env:
+          ORACLE_HOST: ${{ secrets.ORACLE_HOST }}
+          ORACLE_USER: ${{ secrets.ORACLE_USER }}
+        run: |
+          set -euo pipefail
+          rsync -az --delete --chmod=D755,F644 \
+            -e "ssh -o StrictHostKeyChecking=yes" \
+            dist/ "$ORACLE_USER@$ORACLE_HOST:/opt/calcspace/site/"
+
+      - name: Verify production
+        run: |
+          set -euo pipefail
+          curl -fsS --retry 6 --retry-delay 5 \
+            https://calcspace.blueflutex.in/ | grep -q '<title>CalcSpace'
+          curl -fsS https://calcspace.blueflutex.in/sitemap.xml | grep -q 'https://calcspace.blueflutex.in/'

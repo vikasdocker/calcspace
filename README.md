@@ -68,6 +68,13 @@ The browser suite starts its own loopback server by default. Set `$env:CALCSPACE
 | `scripts/browser-test.mjs` | Full route and calculation smoke test plus search, copy, persistence and responsive checks |
 | `TODO.md` | Implementation and verification checklist |
 
+## Production
+
+CalcSpace is deployed at <https://calcspace.blueflutex.in>. GitHub Actions
+builds and publishes to an Oracle Cloud VM, and Cloudflare provides DNS, TLS and
+the tunnel in front of the origin. See `deploy/oracle/README.md` for the
+architecture, secrets and rollback steps.
+
 ## Local SEO output
 
 The production build writes entry HTML with route-specific titles and descriptions, calculator JSON-LD, `robots.txt` and `sitemap.xml`. With the default local configuration, pages use `noindex` and the sitemap uses localhost. Canonical URLs and an indexable sitemap are generated when a future build sets `VITE_SITE_URL` to the intended public origin. CalcSpace currently runs on localhost.

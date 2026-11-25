@@ -1,0 +1,26 @@
+:8080 {
+	root * /srv
+	encode zstd gzip
+
+	# Every route is pre-rendered by the Vite build, so a real 404 is possible.
+	try_files {path} {path}.html {path}/index.html
+	file_server
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Frame-Options SAMEORIGIN
+		-Server
+	}
+
+	@immutable path /assets/*
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+	@documents path / *.html
+	header @documents Cache-Control "public, max-age=300, must-revalidate"
+
+	handle_errors {
+		rewrite * /404.html
+		file_server
+	}
+}
