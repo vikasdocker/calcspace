@@ -18,6 +18,7 @@ export function pageInfo(pathname: string): PageInfo {
     case '/privacy': return { title: 'Privacy policy | CalcSpace', description: 'How CalcSpace handles your data and privacy.', index: true }
     case '/contact': return { title: 'Contact CalcSpace', description: 'Get in touch with the CalcSpace team.', index: true }
     case '/guides': return { title: 'Guides | CalcSpace', description: 'Short explainers to help you use the calculators.', index: true }
+    case '/api-docs': return { title: 'API docs | CalcSpace', description: 'Use the CalcSpace calculator engine over HTTP.', index: true }
     default: {
       const guide = guides.find(item => `/guides/${item.slug}` === path)
       if (guide) return { title: `${guide.title} | CalcSpace`, description: guide.description, index: true }
@@ -26,7 +27,7 @@ export function pageInfo(pathname: string): PageInfo {
   }
 }
 
-export const publicPaths = ['/', '/calculators', '/about', '/privacy', '/contact', '/guides', ...guides.map(g => `/guides/${g.slug}`), ...categories.map(item => categoryPath(item.id)), ...calculators.map(item => item.path)]
+export const publicPaths = ['/', '/calculators', '/about', '/privacy', '/contact', '/guides', '/api-docs', ...guides.map(g => `/guides/${g.slug}`), ...categories.map(item => categoryPath(item.id)), ...calculators.map(item => item.path)]
 
 export function siteOrigin(value: string | undefined) {
   if (!value) return ''

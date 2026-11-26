@@ -147,6 +147,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <Link to="/about">About</Link>
           <Link to="/privacy">Privacy</Link>
           <Link to="/contact">Contact</Link>
+          <Link to="/api-docs">API</Link>
         </nav>
         <p>© CalcSpace</p>
       </footer>

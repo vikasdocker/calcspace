@@ -5,6 +5,7 @@ import '@fontsource-variable/manrope'
 import { calculators, categories, categoryPath } from './calculators/catalog'
 import { CalculatorPage } from './ui/calculator-page'
 import { About, Contact, Directory, Favorites, History, Home, NotFound, Privacy } from './ui/pages'
+import { ApiDocs } from './ui/api-docs'
 import { GuideRoute, Guides } from './ui/guides'
 import { Shell } from './ui/shell'
 import { WorkspaceProvider } from './ui/state'
@@ -24,6 +25,7 @@ function App() {
     <Route path="/contact" element={<Contact/>}/>
     <Route path="/guides" element={<Guides/>}/>
     <Route path="/guides/:slug" element={<GuideRoute/>}/>
+    <Route path="/api-docs" element={<ApiDocs/>}/>
     <Route path="*" element={<NotFound/>}/>
   </Routes></Shell></WorkspaceProvider></LanguageProvider></BrowserRouter>
 }
