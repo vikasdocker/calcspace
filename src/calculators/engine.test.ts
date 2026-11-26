@@ -288,7 +288,7 @@ describe('developer utilities and discovery', () => {
     expect(relatedTo(definition('emi-calculator')).map(item => item.id)).toContain('home-loan-calculator')
   })
   it('defines public paths, canonical origin validation and structured data', () => {
-    expect(publicPaths).toHaveLength(115)
+    expect(publicPaths).toHaveLength(118)
     expect(publicPaths).not.toContain('/history')
     expect(pageInfo('/calculators/emi-calculator/').title).toBe('Loan EMI Calculator | CalcSpace')
     expect(pageInfo('/no-such-page').index).toBe(false)

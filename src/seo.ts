@@ -20,7 +20,7 @@ export function pageInfo(pathname: string): PageInfo {
   }
 }
 
-export const publicPaths = ['/', '/calculators', ...categories.map(item => categoryPath(item.id)), ...calculators.map(item => item.path)]
+export const publicPaths = ['/', '/calculators', '/about', '/privacy', '/contact', ...categories.map(item => categoryPath(item.id)), ...calculators.map(item => item.path)]
 
 export function siteOrigin(value: string | undefined) {
   if (!value) return ''
