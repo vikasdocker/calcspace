@@ -1,4 +1,5 @@
 import { byPath, calculators, categories, categoryPath, getCategory } from './calculators/catalog'
+import { guides } from './ui/guides'
 
 export type PageInfo = { title: string; description: string; index: boolean; application?: string }
 export function pageInfo(pathname: string): PageInfo {
@@ -16,11 +17,16 @@ export function pageInfo(pathname: string): PageInfo {
     case '/about': return { title: 'About CalcSpace', description: 'Learn about CalcSpace, a free collection of online calculators.', index: true }
     case '/privacy': return { title: 'Privacy policy | CalcSpace', description: 'How CalcSpace handles your data and privacy.', index: true }
     case '/contact': return { title: 'Contact CalcSpace', description: 'Get in touch with the CalcSpace team.', index: true }
-    default: return { title: 'Page not found | CalcSpace', description: 'Find the calculator you need in the CalcSpace directory.', index: false }
+    case '/guides': return { title: 'Guides | CalcSpace', description: 'Short explainers to help you use the calculators.', index: true }
+    default: {
+      const guide = guides.find(item => `/guides/${item.slug}` === path)
+      if (guide) return { title: `${guide.title} | CalcSpace`, description: guide.description, index: true }
+      return { title: 'Page not found | CalcSpace', description: 'Find the calculator you need in the CalcSpace directory.', index: false }
+    }
   }
 }
 
-export const publicPaths = ['/', '/calculators', '/about', '/privacy', '/contact', ...categories.map(item => categoryPath(item.id)), ...calculators.map(item => item.path)]
+export const publicPaths = ['/', '/calculators', '/about', '/privacy', '/contact', '/guides', ...guides.map(g => `/guides/${g.slug}`), ...categories.map(item => categoryPath(item.id)), ...calculators.map(item => item.path)]
 
 export function siteOrigin(value: string | undefined) {
   if (!value) return ''
