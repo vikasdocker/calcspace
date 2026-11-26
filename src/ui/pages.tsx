@@ -155,3 +155,35 @@ export function NotFound() {
       <Link className="button button-primary" to="/calculators">Browse calculators</Link></div>
   </div>
 }
+
+export function About() {
+  return <div className="page-width inner-page">
+    <Breadcrumbs current="About"/>
+    <div className="page-heading"><h1 tabIndex={-1}>About CalcSpace</h1><p>CalcSpace is a free collection of calculators for math, money, conversions, health, dates and developer tasks.</p></div>
+    <section className="panel"><p>Every tool runs in your browser. Inputs are not sent to a server, and saved history stays on your device. We focus on clear formulas, worked examples and accessible interfaces.</p>
+      <p>Have a suggestion or spot an error? <Link to="/contact" className="text-link">Contact us</Link>.</p></section>
+  </div>
+}
+
+export function Privacy() {
+  return <div className="page-width inner-page">
+    <Breadcrumbs current="Privacy"/>
+    <div className="page-heading"><h1 tabIndex={-1}>Privacy policy</h1><p>How CalcSpace handles your data.</p></div>
+    <section className="panel">
+      <p>CalcSpace does not require an account. Calculations run locally in your browser. Favorites, history and theme preference are stored in your browser's local storage and are not transmitted to our servers.</p>
+      <p>We use basic analytics and advertising partners (such as Monetag) to keep the site free. These partners may use cookies or similar technologies as described in their own policies.</p>
+      <p>If you clear your browser storage, your saved favorites and history will be removed.</p>
+    </section>
+  </div>
+}
+
+export function Contact() {
+  return <div className="page-width inner-page">
+    <Breadcrumbs current="Contact"/>
+    <div className="page-heading"><h1 tabIndex={-1}>Contact</h1><p>Get in touch with the CalcSpace team.</p></div>
+    <section className="panel">
+      <p>Email: <a className="text-link" href="mailto:hello@blueflutex.in">hello@blueflutex.in</a></p>
+      <p>We welcome calculator requests, bug reports and feedback.</p>
+    </section>
+  </div>
+}

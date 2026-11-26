@@ -2,7 +2,7 @@ import { useEffect, useRef, type ReactNode } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { Calculator, Clock3, Grid2X2, House, Menu, Moon, Star, Sun, X } from 'lucide-react'
 import { categories, categoryPath } from '../calculators/catalog'
-import { pageInfo, siteOrigin, structuredData } from '../seo'
+import { pageInfo, siteOrigin, structuredData, breadcrumbSchema, faqSchema, websiteSchema } from '../seo'
 import { categoryIcons } from './icons'
 import { SearchBox } from './components'
 import { useWorkspace } from './state'
@@ -36,6 +36,24 @@ function Navigation({ close }: { close?: () => void }) {
   </>
 }
 
+function useAnalytics(pathname: string) {
+  const gaId = import.meta.env.VITE_GA_ID as string | undefined
+  useEffect(() => {
+    if (!gaId) return
+    if (!document.querySelector(`script[src*="googletagmanager.com/gtag/js?id=${gaId}"]`)) {
+      const script = document.createElement('script')
+      script.async = true
+      script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`
+      document.head.appendChild(script)
+      const inline = document.createElement('script')
+      inline.textContent = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${gaId}',{send_page_view:false});`
+      document.head.appendChild(inline)
+    }
+    const w = window as unknown as { gtag?: (...args: unknown[]) => void }
+    w.gtag?.('event', 'page_view', { page_path: pathname, page_location: window.location.href, page_title: document.title })
+  }, [gaId, pathname])
+}
+
 function useHead(pathname: string) {
   useEffect(() => {
     const normalized = pathname.replace(/\/+$/, '') || '/'
@@ -51,8 +69,31 @@ function useHead(pathname: string) {
     }
     setTag('meta[name="robots"]','meta',{name:'robots',content:origin && meta.index ? 'index,follow' : 'noindex,nofollow'})
     setTag('link[rel="canonical"]','link',origin && meta.index ? {rel:'canonical',href:new URL(normalized,origin).href} : undefined)
-    const schema = structuredData(meta, origin, normalized)
-    setTag('script[type="application/ld+json"]','script',schema ? {type:'application/ld+json'} : undefined,JSON.stringify(schema))
+    const canonicalUrl = origin && meta.index ? new URL(normalized, origin).href : ''
+    setTag('meta[property="og:title"]','meta',{property:'og:title',content:meta.title})
+    setTag('meta[property="og:description"]','meta',{property:'og:description',content:meta.description})
+    setTag('meta[property="og:type"]','meta',{property:'og:type',content:'website'})
+    setTag('meta[property="og:site_name"]','meta',{property:'og:site_name',content:'CalcSpace'})
+    if (canonicalUrl) setTag('meta[property="og:url"]','meta',{property:'og:url',content:canonicalUrl})
+    setTag('meta[property="og:image"]','meta',{property:'og:image',content: origin ? new URL('/calcspace.svg', origin).href : '/calcspace.svg'})
+    setTag('meta[name="twitter:card"]','meta',{name:'twitter:card',content:'summary'})
+    setTag('meta[name="twitter:title"]','meta',{name:'twitter:title',content:meta.title})
+    setTag('meta[name="twitter:description"]','meta',{name:'twitter:description',content:meta.description})
+
+    document.querySelectorAll('script[data-seo-schema="true"]').forEach(node => node.remove())
+    const schemas = [
+      structuredData(meta, origin, normalized),
+      breadcrumbSchema(normalized, origin),
+      faqSchema(normalized),
+      normalized === '/' ? websiteSchema(origin) : undefined,
+    ].filter(Boolean) as Record<string, unknown>[]
+    for (const schema of schemas) {
+      const script = document.createElement('script')
+      script.type = 'application/ld+json'
+      script.dataset.seoSchema = 'true'
+      script.textContent = JSON.stringify(schema).replaceAll('<', '\\u003c')
+      document.head.appendChild(script)
+    }
   },[pathname])
 }
 
@@ -62,6 +103,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const drawer = useRef<HTMLDialogElement>(null)
   const previousPath = useRef(pathname)
   useHead(pathname)
+  useAnalytics(pathname)
   useEffect(() => {
     if (previousPath.current !== pathname) {
       window.scrollTo(0,0)
@@ -96,6 +138,14 @@ export function Shell({ children }: { children: ReactNode }) {
         </div>
       </header>
       <main id="main" tabIndex={-1} className="main">{children}</main>
+      <footer className="site-footer">
+        <nav aria-label="Footer">
+          <Link to="/about">About</Link>
+          <Link to="/privacy">Privacy</Link>
+          <Link to="/contact">Contact</Link>
+        </nav>
+        <p>© CalcSpace</p>
+      </footer>
     </div>
   </div>
 }

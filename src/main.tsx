@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import '@fontsource-variable/manrope'
 import { calculators, categories, categoryPath } from './calculators/catalog'
 import { CalculatorPage } from './ui/calculator-page'
-import { Directory, Favorites, History, Home, NotFound } from './ui/pages'
+import { About, Contact, Directory, Favorites, History, Home, NotFound, Privacy } from './ui/pages'
 import { Shell } from './ui/shell'
 import { WorkspaceProvider } from './ui/state'
 import './styles.css'
@@ -17,6 +17,9 @@ function App() {
     {calculators.map(calculator => <Route key={calculator.id} path={calculator.path} element={<CalculatorPage key={calculator.id} calculator={calculator}/>}/>)}
     <Route path="/favorites" element={<Favorites/>}/>
     <Route path="/history" element={<History/>}/>
+    <Route path="/about" element={<About/>}/>
+    <Route path="/privacy" element={<Privacy/>}/>
+    <Route path="/contact" element={<Contact/>}/>
     <Route path="*" element={<NotFound/>}/>
   </Routes></Shell></WorkspaceProvider></BrowserRouter>
 }
