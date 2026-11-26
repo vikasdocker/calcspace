@@ -8,10 +8,11 @@ import { About, Contact, Directory, Favorites, History, Home, NotFound, Privacy 
 import { GuideRoute, Guides } from './ui/guides'
 import { Shell } from './ui/shell'
 import { WorkspaceProvider } from './ui/state'
+import { LanguageProvider } from './i18n'
 import './styles.css'
 
 function App() {
-  return <BrowserRouter useTransitions={false}><WorkspaceProvider><Shell><Routes>
+  return <BrowserRouter useTransitions={false}><LanguageProvider><WorkspaceProvider><Shell><Routes>
     <Route path="/" element={<Home/>}/>
     <Route path="/calculators" element={<Directory/>}/>
     {categories.map(category => <Route key={category.id} path={categoryPath(category.id)} element={<Directory fixedCategory={category.id}/>}/>)}
@@ -24,7 +25,7 @@ function App() {
     <Route path="/guides" element={<Guides/>}/>
     <Route path="/guides/:slug" element={<GuideRoute/>}/>
     <Route path="*" element={<NotFound/>}/>
-  </Routes></Shell></WorkspaceProvider></BrowserRouter>
+  </Routes></Shell></WorkspaceProvider></LanguageProvider></BrowserRouter>
 }
 
 createRoot(document.getElementById('root')!).render(<StrictMode><App/></StrictMode>)

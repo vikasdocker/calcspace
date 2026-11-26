@@ -5,6 +5,7 @@ import { byId, calculators, categories, getCategory, popular, searchCalculators,
 import { formatValue, resultText, type Category } from '../calculators/core'
 import { Breadcrumbs, CalculatorCard, CategoryCard, CopyButton, Empty, SearchBox, SectionHeading, TileIcon } from './components'
 import { useWorkspace } from './state'
+import { useLanguage } from '../i18n'
 
 function HeroIllustration() {
   return <div className="hero-illustration" aria-hidden="true">
@@ -27,12 +28,13 @@ function HeroIllustration() {
 
 export function Home() {
   const { favorites, recents } = useWorkspace()
+  const { t } = useLanguage()
   return <div className="home page-width">
     <section className="hero">
       <div className="hero-backdrop"/>
       <div className="hero-content">
-        <h1 tabIndex={-1}>Every calculation.<br/><span>One space.</span></h1>
-        <p>Find the right calculator for math, money, conversions and everyday decisions.</p>
+        <h1 tabIndex={-1}>{t('home.title')}</h1>
+        <p>{t('home.subtitle')}</p>
         <SearchBox variant="hero"/>
         <div className="quick-links"><span>Try</span>{suggestions.map(calculator => <Link to={calculator.path} key={calculator.id}>
           {({ 'gst-calculator':'GST', 'acre-to-guntha':'Acre to guntha', 'salary-hike-calculator':'Salary hike' } as Record<string,string>)[calculator.id]}
@@ -41,12 +43,12 @@ export function Home() {
       <HeroIllustration/>
     </section>
     <section className="home-section" aria-labelledby="popular-heading">
-      <div className="section-heading"><div><h2 id="popular-heading">Popular calculators</h2><p>A quick start for common calculations.</p></div>
+      <div className="section-heading"><div><h2 id="popular-heading">{t('home.popular')}</h2><p>A quick start for common calculations.</p></div>
         <Link className="text-link" to="/calculators">View all calculators</Link></div>
       <div className="card-grid">{popular.map(calculator => <CalculatorCard key={calculator.id} calculator={calculator}/>)}</div>
     </section>
     <section className="home-section">
-      <SectionHeading title="Browse by category" subtitle="Find the tools for the numbers you’re working with."/>
+      <SectionHeading title={t('home.categories')} subtitle="Find the tools for the numbers you’re working with."/>
       <div className="category-grid">{categories.map(category => <CategoryCard key={category.id} category={category.id}/>)}</div>
     </section>
     <section className="home-section">

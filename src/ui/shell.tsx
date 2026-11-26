@@ -6,16 +6,18 @@ import { pageInfo, siteOrigin, structuredData, breadcrumbSchema, faqSchema, webs
 import { categoryIcons } from './icons'
 import { SearchBox } from './components'
 import { useWorkspace } from './state'
+import { useLanguage } from '../i18n'
 
 const origin = siteOrigin(import.meta.env.VITE_SITE_URL)
 const primaryLinks = [
-  { to: '/', name: 'Overview', Icon: House },
-  { to: '/calculators', name: 'All calculators', Icon: Grid2X2 },
-  { to: '/favorites', name: 'Favorites', Icon: Star },
-  { to: '/history', name: 'History', Icon: Clock3 },
+  { to: '/', key: 'nav.overview', Icon: House },
+  { to: '/calculators', key: 'nav.all', Icon: Grid2X2 },
+  { to: '/favorites', key: 'nav.favorites', Icon: Star },
+  { to: '/history', key: 'nav.history', Icon: Clock3 },
 ]
 
 function Navigation({ close }: { close?: () => void }) {
+  const { t } = useLanguage()
   return <>
     <div className="brand-row">
       <Link to="/" className="brand" onClick={close} aria-label="CalcSpace home">
@@ -24,7 +26,7 @@ function Navigation({ close }: { close?: () => void }) {
       {close && <button className="icon-button" type="button" aria-label="Close navigation" onClick={close}><X size={21}/></button>}
     </div>
     <nav className="side-nav" aria-label="Main navigation">
-      <ul>{primaryLinks.map(({to,name,Icon}) => <li key={to}><NavLink to={to} end onClick={close}><Icon size={18} aria-hidden="true"/>{name}</NavLink></li>)}</ul>
+      <ul>{primaryLinks.map(({to,key,Icon}) => <li key={to}><NavLink to={to} end onClick={close}><Icon size={18} aria-hidden="true"/>{t(key)}</NavLink></li>)}</ul>
       <p className="nav-label">Categories</p>
       <ul>{categories.map(item => {
         const Icon = categoryIcons[item.id]
@@ -99,6 +101,7 @@ function useHead(pathname: string) {
 
 export function Shell({ children }: { children: ReactNode }) {
   const { theme, toggleTheme } = useWorkspace()
+  const { lang, setLang } = useLanguage()
   const { pathname } = useLocation()
   const drawer = useRef<HTMLDialogElement>(null)
   const previousPath = useRef(pathname)
@@ -135,6 +138,7 @@ export function Shell({ children }: { children: ReactNode }) {
         <div className="top-actions">
           <Link to="/history" className="icon-button top-history" aria-label="Calculation history" title="Calculation history"><Clock3 size={20}/></Link>
           <button type="button" className="icon-button theme-button" aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`} onClick={toggleTheme}><ThemeIcon size={20}/></button>
+          <button type="button" className="icon-button" onClick={() => setLang(lang === 'en' ? 'hi' : 'en')} aria-label="Switch language">{lang === 'en' ? 'हि' : 'EN'}</button>
         </div>
       </header>
       <main id="main" tabIndex={-1} className="main">{children}</main>
