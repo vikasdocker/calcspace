@@ -1,11 +1,41 @@
 import express from 'express'
 import cors from 'cors'
+import { randomBytes } from 'node:crypto'
+import { readFileSync, writeFileSync, existsSync } from 'node:fs'
+import { join } from 'node:path'
 import { calculators, byId } from '../../src/calculators/catalog'
 import type { RawInputs } from '../../src/calculators/core'
+
+const KEYS_FILE = process.env.KEYS_FILE || join(process.cwd(), 'keys.json')
+function readKeys(): string[] {
+  if (!existsSync(KEYS_FILE)) return []
+  try { return JSON.parse(readFileSync(KEYS_FILE, 'utf8')) } catch { return [] }
+}
+function saveKeys(keys: string[]) {
+  writeFileSync(KEYS_FILE, JSON.stringify(keys, null, 2))
+}
+function isValidKey(key: string | undefined) {
+  if (!key) return false
+  return readKeys().includes(key)
+}
 
 const app = express()
 app.use(cors())
 app.use(express.json({ limit: '1mb' }))
+
+app.post('/api/keys', (_req, res) => {
+  const key = 'csk_' + randomBytes(24).toString('hex')
+  const keys = readKeys()
+  keys.push(key)
+  saveKeys(keys)
+  res.json({ key })
+})
+
+app.use('/api/calculate', (req, res, next) => {
+  const key = req.header('x-api-key')
+  if (!isValidKey(key)) return res.status(401).json({ error: 'Invalid or missing API key' })
+  next()
+})
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, calculators: calculators.length })
