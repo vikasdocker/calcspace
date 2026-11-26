@@ -1,0 +1,12 @@
+{
+  "name": "CalcSpace",
+  "short_name": "CalcSpace",
+  "description": "Free online calculators for math, money, conversions, health, dates and developer tasks.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f8fc",
+  "theme_color": "#f7f8fc",
+  "icons": [
+    { "src": "/calcspace.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
